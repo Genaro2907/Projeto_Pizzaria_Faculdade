@@ -3,12 +3,12 @@ package projeto_pizzaria_faculdade.Util.items;
 
 import projeto_pizzaria_faculdade.Util.ItemPedido;
 
-public class Bebidas extends ItemPedido{
+public class Bebida extends ItemPedido{
 	
 	private boolean comGelo;
 	private String tamanho;
 	
-	public Bebidas(String nome, double preco, String tamanho, boolean comGelo) {
+	public Bebida(String nome, double preco, String tamanho, boolean comGelo) {
         super(nome, preco);
         this.tamanho = tamanho;
         this.comGelo = comGelo;

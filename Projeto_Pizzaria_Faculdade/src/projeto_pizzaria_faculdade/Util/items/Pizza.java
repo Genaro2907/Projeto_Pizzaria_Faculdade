@@ -4,13 +4,13 @@ import java.util.List;
 
 import projeto_pizzaria_faculdade.Util.ItemPedido;
 
-public class Pizzas extends ItemPedido{
+public class Pizza extends ItemPedido{
 	
 	private String tamanho;
 	private List<String> ingredientesExtras;
 	
 	
-	public Pizzas(String nome, double precoBase, String tamanho, List<String> extras) {
+	public Pizza(String nome, double precoBase, String tamanho, List<String> extras) {
 		super(nome, calcularPreco(tamanho,precoBase, extras.size()));
 		
 		this.tamanho = tamanho;
