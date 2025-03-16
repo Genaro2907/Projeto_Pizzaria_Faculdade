@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import projeto_pizzaria_faculdade.Util.Cliente;
 import projeto_pizzaria_faculdade.Util.Pedido;
+import projeto_pizzaria_faculdade.Util.TipoBebida;
 import projeto_pizzaria_faculdade.Util.items.Bebida;
 import projeto_pizzaria_faculdade.Util.items.Pizza;
 import projeto_pizzaria_faculdade.Util.items.StatusPedido;
@@ -28,7 +29,14 @@ public class Program {
     	        Pedido pedido = new Pedido(cliente);
     	        
     	        pedido.adicionarItem(new Pizza("Margherita", 25.0, "Média", new ArrayList<>()));
-    	        pedido.adicionarItem(new Bebida("Coca-Cola", 8.0, "500ml", true));
+    	        
+    	        Bebida refrigerante = new Bebida("Coca-Cola", TipoBebida.REFRIGERANTE, 8.0, "500ml", true);
+    	        Bebida agua = new Bebida("Minalba", TipoBebida.AGUA, 5.0, "500ml", false);
+    	        Bebida cerveja = new Bebida("Heineken", TipoBebida.CERVEJA, 10.0, "600ml", true);
+    	        
+    	        pedido.adicionarItem(refrigerante);
+    	        pedido.adicionarItem(agua);
+    	        pedido.adicionarItem(cerveja);
     	        
     	        pedido.setStatus(StatusPedido.EM_PREPARO);
     	        

@@ -67,9 +67,14 @@ public class Pedido {
                   .append(", Extras: ").append(String.join(", ", pizza.getIngredientesExtras()))
                   .append(") → R$ ").append(pizza.getPreco()).append("\n");
             } else if (item instanceof Bebida) {
-            	Bebida bebida = (Bebida) item;
-                sb.append("- ").append(bebida.getNome())
-                  .append(" (").append(bebida.getTamanho())
+                Bebida bebida = (Bebida) item;
+                sb.append("- ")
+                  .append(bebida.getTipo().toString().charAt(0))
+                  .append(bebida.getTipo().toString().substring(1).toLowerCase())
+                  .append(" ")
+                  .append(bebida.getMarca())
+                  .append(" (")
+                  .append(bebida.getTamanho())
                   .append(", Gelo: ").append(bebida.isComGelo() ? "Sim" : "Não")
                   .append(") → R$ ").append(bebida.getPreco()).append("\n");
             }
