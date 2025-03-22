@@ -20,6 +20,7 @@ public class Pedido {
 	private StatusPedido status;
 	private static List<Pedido> todosPedidos = new ArrayList<>();
 	
+        public Pedido(){};
 	public Pedido(Cliente cliente) {
 		this.idPedido = proximoId++;
 		this.cliente = cliente;

@@ -4,7 +4,7 @@
  */
 package projeto_pizzaria_faculdade.UI;
 
-import projeto_pizzaria_faculdade.UI.MainScreen;
+import projeto_pizzaria_faculdade.UI.PedidoScreen;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
@@ -119,6 +119,7 @@ public class LoginScreen extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
     
     
+    
     private void carregarUsuariosTeste() {
     usuarios.put("admin", "admin123");
     usuarios.put("user", "senha123");
@@ -133,7 +134,17 @@ public class LoginScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtSenhaActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        // TODO add your handling code here:
+    int resposta = JOptionPane.showConfirmDialog(
+        this, 
+        "Deseja realmente sair do sistema?", 
+        "Confirmação", 
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE
+    );
+    
+    if (resposta == JOptionPane.YES_OPTION) {
+        System.exit(0);
+    }
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
@@ -149,7 +160,7 @@ public class LoginScreen extends javax.swing.JFrame {
     }
     
     if(usuarios.containsKey(usuario) && usuarios.get(usuario).equals(senha)) {
-        new MainScreen().setVisible(true);
+        new PedidoScreen().setVisible(true);
         this.dispose();
     } else {
         JOptionPane.showMessageDialog(this, 
