@@ -14,7 +14,7 @@ public class Pedido {
 	
 	private int idPedido;
 	private Cliente cliente;
-	private List<ItemPedido> itens;
+	private List<ItemPedido> itens = new ArrayList<>();
 	private LocalDateTime dataHora;
 	private double total;
 	private StatusPedido status;
@@ -31,27 +31,27 @@ public class Pedido {
 		todosPedidos.add(this);
 	}
 	
-	public void adicionarItem(ItemPedido item) {
-	    itens.add(item);
-	    calcularTotal(); 
-	}
+	public double calcularTotal() {
+        this.total = itens.stream()
+            .mapToDouble(ItemPedido::getPreco)
+            .sum();
+        return this.total;
+    }
 
-	public boolean removerItem(ItemPedido item) {
-	    boolean removido = itens.remove(item);
-	    if(removido) {
-	        calcularTotal();
-	    }
-	    return removido;
-	}
-	private void calcularTotal() {
-	    this.total = itens.stream()
-	        .mapToDouble(ItemPedido::getPreco)
-	        .sum();
-	}
-	public static List<Pedido> getTodosPedidos() {
-	    return new ArrayList<>(todosPedidos); //
-	}
-    public String getDetalhesPedido() {
+    public void adicionarItem(ItemPedido item) {
+        itens.add(item);
+        this.total = calcularTotal();
+    }
+
+    public boolean removerItem(ItemPedido item) {
+        boolean removido = itens.remove(item);
+        if (removido) {
+            this.total = calcularTotal();
+        }
+        return removido;
+    }
+	
+    /*public String getDetalhesPedido() {
         StringBuilder sb = new StringBuilder();
         sb.append("Pedido ID: ").append(idPedido).append("\n");
         sb.append("Cliente: ").append(cliente.getNomeCliente()).append("\n");
@@ -85,7 +85,7 @@ public class Pedido {
         sb.append("\nStatus: ").append(status);
         
         return sb.toString();
-    }
+    }*/
 	public int getIdPedido() {
 		return idPedido;
 	}

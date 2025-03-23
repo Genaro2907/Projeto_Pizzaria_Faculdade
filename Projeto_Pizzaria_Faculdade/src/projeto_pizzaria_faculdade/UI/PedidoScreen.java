@@ -5,14 +5,21 @@
 package projeto_pizzaria_faculdade.UI;
 
 import java.awt.GridLayout;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 import projeto_pizzaria_faculdade.Util.Cliente;
+import projeto_pizzaria_faculdade.Util.ItemPedido;
+import projeto_pizzaria_faculdade.Util.Pedido;
+import projeto_pizzaria_faculdade.Util.items.Bebida;
+import projeto_pizzaria_faculdade.Util.items.Pizza;
 
 /**
  *
@@ -20,15 +27,14 @@ import projeto_pizzaria_faculdade.Util.Cliente;
  */
 public class PedidoScreen extends javax.swing.JFrame {
     private Cliente clienteAtual;
+    private Pedido pedidoAtual;
     /**
      * Creates new form PedidoScreen
      */
     public PedidoScreen() {
         initComponents();
-    }
-    
-   
-
+        pedidoAtual = new Pedido();
+    } 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -75,6 +81,11 @@ public class PedidoScreen extends javax.swing.JFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Itens do Pedido"));
 
         btnAddBebida.setText("Adicionar Bebida");
+        btnAddBebida.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddBebidaActionPerformed(evt);
+            }
+        });
         jPanel3.add(btnAddBebida);
 
         btnAddPizza.setText("Adicionar Pizza");
@@ -133,38 +144,72 @@ public class PedidoScreen extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    private void atualizarTabelaItens() {
+    DefaultTableModel model = (DefaultTableModel) tblItens.getModel();
+    model.setRowCount(0); // Limpa a tabela
 
+    for (ItemPedido item : pedidoAtual.getItens()) {
+        if (item instanceof Pizza) {
+            Pizza pizza = (Pizza) item;
+            model.addRow(new Object[]{
+                "Pizza",
+                pizza.getNome() + " (" + pizza.getTamanho() + ") - " + 
+                String.join(", ", pizza.getIngredientesExtras()),
+                "R$ " + pizza.getPreco()
+            });
+        }else if (item instanceof Bebida) {
+            Bebida bebida = (Bebida) item;
+            model.addRow(new Object[]{
+                "Bebida",
+                bebida.getMarca() + " - " + bebida.getTamanho().getMl() + "ml" +
+                (bebida.isComGelo() ? " (Com Gelo)" : " (Sem Gelo)"),
+                "R$ " + bebida.getPreco()
+            });
+        }
+    }
+
+    lblTotal.setText(String.format("Total: R$ %.2f", pedidoAtual.getTotal()));
+} 
     private void btnAddPizzaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPizzaActionPerformed
-        JDialog dialog = new JDialog(this, "Nova Pizza", true);
-        dialog.setLayout(new GridLayout(0, 2, 10, 10));
-    
+    JDialog dialog = new JDialog(this, "Selecionar Pizza", true);
+    dialog.setLayout(new GridLayout(0, 2, 10, 10));
+
     // Componentes
-        JComboBox<String> cmbSabor = new JComboBox<>(new String[]{"Margherita", "Calabresa", "Portuguesa"});
-        JComboBox<String> cmbTamanho = new JComboBox<>(new String[]{"Pequena", "Média", "Grande"});
-        JCheckBox chkBorda = new JCheckBox("Borda Recheada (+R$5)");
-        JButton btnAdd = new JButton("Adicionar");
-    
-    // Adicionar ao diálogo
-        dialog.add(new JLabel("Sabor:"));
-        dialog.add(cmbSabor);
-        dialog.add(new JLabel("Tamanho:"));
-        dialog.add(cmbTamanho);
-        dialog.add(chkBorda);
-        dialog.add(btnAdd);
-    
-    // Ação do botão
-    btnAdd.addActionListener(e -> {
-        DefaultTableModel model = (DefaultTableModel) tblItens.getModel();
-        model.addRow(new Object[]{
-            "Pizza",
-            cmbSabor.getSelectedItem() + " " + cmbTamanho.getSelectedItem() + 
-            (chkBorda.isSelected() ? " com Borda" : ""),
-            "R$ " + calcularPrecoPizza(cmbTamanho.getSelectedItem().toString(), chkBorda.isSelected())
-        });
-        atualizarTotal();
+    JComboBox<String> cmbSabor = new JComboBox<>(new String[]{
+        Pizza.MARGHERITA, 
+        Pizza.CALABRESA, 
+        Pizza.PORTUGUESA
+    });
+    JComboBox<String> cmbTamanho = new JComboBox<>(new String[]{"P", "M", "G"});
+    JList<String> lstExtras = new JList<>(new String[]{"Queijo Extra", "Bacon", "Cebola"});
+    JButton btnConfirmar = new JButton("Adicionar");
+
+    btnConfirmar.addActionListener(e -> {
+        String sabor = (String) cmbSabor.getSelectedItem();
+        String tamanho = (String) cmbTamanho.getSelectedItem();
+        List<String> extras = lstExtras.getSelectedValuesList();
+
+        Pizza pizza = switch(sabor) {
+            case Pizza.MARGHERITA -> Pizza.criarMargherita(tamanho, extras);
+            case Pizza.CALABRESA -> Pizza.criarCalabresa(tamanho, extras);
+            case Pizza.PORTUGUESA -> Pizza.criarPortuguesa(tamanho, extras);
+            default -> throw new IllegalArgumentException("Sabor inválido");
+        };
+
+        pedidoAtual.adicionarItem(pizza);
+        atualizarTabelaItens();
         dialog.dispose();
     });
-    
+
+    // Layout do diálogo
+    dialog.add(new JLabel("Sabor:"));
+    dialog.add(cmbSabor);
+    dialog.add(new JLabel("Tamanho:"));
+    dialog.add(cmbTamanho);
+    dialog.add(new JLabel("Extras:"));
+    dialog.add(new JScrollPane(lstExtras));
+    dialog.add(btnConfirmar);
+
     dialog.pack();
     dialog.setLocationRelativeTo(this);
     dialog.setVisible(true);
@@ -173,42 +218,81 @@ public class PedidoScreen extends javax.swing.JFrame {
     private void btnFinalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinalizarActionPerformed
         
         String nome = txtNome.getText().trim();
-        String endereco = txtEndereco.getText().trim();
-         // Passo 2: Validar campos
-        if (nome.isEmpty() || endereco.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Preencha nome e endereço!");
-            return;
-        }
-        // Passo 3: Vincular à entidade Cliente
-        clienteAtual = new Cliente(nome, endereco);
-
-        // Passo 4: Confirmar (exemplo simples)
-        JOptionPane.showMessageDialog(this, 
-            "Cliente cadastrado:\n" + 
-            "Nome: " + clienteAtual.getNomeCliente() + "\n" +
-            "Endereço: " + clienteAtual.getEnderecoCliente()
-        );
-        // Passo 5: Limpar campos (opcional)
-        txtNome.setText("");
-        txtEndereco.setText("");
-    }//GEN-LAST:event_btnFinalizarActionPerformed
+    String endereco = txtEndereco.getText().trim();
     
-    private double calcularPrecoPizza(String tamanho, boolean borda) {
-    double preco = 0;
-    switch(tamanho) {
-        case "Pequena": preco = 25; break;
-        case "Média": preco = 35; break;
-        case "Grande": preco = 45; break;
+    if (nome.isEmpty() || endereco.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Preencha nome e endereço!");
+        return;
     }
-    return preco + (borda ? 5 : 0);
-    }
+    
+    clienteAtual = new Cliente(nome, endereco);
+    pedidoAtual.setCliente(clienteAtual); // Adicione este método na classe Pedido
+    
+    JOptionPane.showMessageDialog(this, 
+        "Pedido finalizado!\n" + 
+        "Cliente: " + clienteAtual.getNomeCliente() + "\n" +
+        "Total: R$ " + pedidoAtual.calcularTotal()
+    );
+    
+    // Reiniciar para novo pedido
+    pedidoAtual = new Pedido();
+    txtNome.setText("");
+    txtEndereco.setText("");
+    atualizarTabelaItens();
+    }//GEN-LAST:event_btnFinalizarActionPerformed
+
+    private void btnAddBebidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBebidaActionPerformed
+       JDialog dialog = new JDialog(this, "Adicionar Bebida", true);
+    dialog.setLayout(new GridLayout(0, 2, 10, 10));
+
+    // Componentes
+    JComboBox<String> cmbTipo = new JComboBox<>(new String[]{
+        Bebida.COCA_COLA, 
+        Bebida.GUARANA, 
+        Bebida.AGUA_MINERAL
+    });
+    JComboBox<Bebida.Tamanho> cmbTamanho = new JComboBox<>(Bebida.Tamanho.values());
+    JCheckBox chkGelo = new JCheckBox("Com Gelo");
+    JButton btnConfirmar = new JButton("Adicionar");
+
+    btnConfirmar.addActionListener(e -> {
+        String tipo = (String) cmbTipo.getSelectedItem();
+        Bebida.Tamanho tamanho = (Bebida.Tamanho) cmbTamanho.getSelectedItem();
+        boolean comGelo = chkGelo.isSelected();
+
+        Bebida bebida = switch(tipo) {
+            case Bebida.COCA_COLA -> Bebida.criarCocaCola(tamanho, comGelo);
+            case Bebida.GUARANA -> Bebida.criarGuarana(tamanho, comGelo);
+            case Bebida.AGUA_MINERAL -> Bebida.criarAguaMineral(tamanho, comGelo);
+            default -> throw new IllegalArgumentException("Tipo inválido");
+        };
+
+        pedidoAtual.adicionarItem(bebida);
+        atualizarTabelaItens();
+        dialog.dispose();
+    });
+
+    // Layout do diálogo
+    dialog.add(new JLabel("Tipo:"));
+    dialog.add(cmbTipo);
+    dialog.add(new JLabel("Tamanho:"));
+    dialog.add(cmbTamanho);
+    dialog.add(new JLabel("Gelo:"));
+    dialog.add(chkGelo);
+    dialog.add(btnConfirmar);
+
+    dialog.pack();
+    dialog.setLocationRelativeTo(this);
+    dialog.setVisible(true);
+    }//GEN-LAST:event_btnAddBebidaActionPerformed
+   
     private void atualizarTotal() {
     double total = 0;
     for(int i = 0; i < tblItens.getRowCount(); i++) {
         String precoStr = tblItens.getValueAt(i, 2).toString().replace("R$ ", "");
         total += Double.parseDouble(precoStr);
     }
-    lblTotal.setText(String.format("Total: R$ %.2f", total));
+    lblTotal.setText(String.format("Total: R$ %.3f", pedidoAtual.getTotal()));
     }
     
     /**

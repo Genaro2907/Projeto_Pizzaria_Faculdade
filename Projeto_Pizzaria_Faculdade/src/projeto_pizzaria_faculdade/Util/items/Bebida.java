@@ -2,56 +2,63 @@ package projeto_pizzaria_faculdade.Util.items;
 
 
 import projeto_pizzaria_faculdade.Util.ItemPedido;
-import projeto_pizzaria_faculdade.Util.TipoBebida;
 
 public class Bebida extends ItemPedido {
+    // Tipos pré-definidos de bebidas
+    public static final String COCA_COLA = "Coca-Cola";
+    public static final String GUARANA = "Guaraná";
+    public static final String AGUA_MINERAL = "Água Mineral";
+    
+    // Tamanhos pré-definidos
+    public enum Tamanho {
+        PEQUENO(300, 5.0),  // 300ml
+        MEDIO(500, 7.0),    // 500ml
+        GRANDE(1000, 10.0); // 1L
+        
+        private final int ml;
+        private final double precoBase;
+        
+        Tamanho(int ml, double precoBase) {
+            this.ml = ml;
+            this.precoBase = precoBase;
+        }
+        
+        public int getMl() { return ml; }
+        public double getPrecoBase() { return precoBase; }
+    }
+
     private String marca;
-    private TipoBebida tipo;
-    private String tamanho;
+    private Tamanho tamanho;
     private boolean comGelo;
 
-    public Bebida(String marca, TipoBebida tipo, double preco, String tamanho, boolean comGelo) {
-        super(gerarNome(tipo, marca), preco);
+    // Construtor privado para controlar a criação
+    private Bebida(String marca, Tamanho tamanho, boolean comGelo) {
+        super(marca, calcularPreco(tamanho));
         this.marca = marca;
-        this.tipo = tipo;
         this.tamanho = tamanho;
         this.comGelo = comGelo;
     }
 
-    private static String gerarNome(TipoBebida tipo, String marca) {
-        return tipo.toString().charAt(0) + tipo.toString().substring(1).toLowerCase() + " " + marca;
+    // Método para calcular preço baseado no tamanho
+    private static double calcularPreco(Tamanho tamanho) {
+        return tamanho.getPrecoBase();
     }
 
-	public String getMarca() {
-		return marca;
-	}
+    // Métodos estáticos para criar bebidas pré-definidas
+    public static Bebida criarCocaCola(Tamanho tamanho, boolean comGelo) {
+        return new Bebida(COCA_COLA, tamanho, comGelo);
+    }
 
-	public void setMarca(String marca) {
-		this.marca = marca;
-	}
+    public static Bebida criarGuarana(Tamanho tamanho, boolean comGelo) {
+        return new Bebida(GUARANA, tamanho, comGelo);
+    }
 
-	public TipoBebida getTipo() {
-		return tipo;
-	}
+    public static Bebida criarAguaMineral(Tamanho tamanho, boolean comGelo) {
+        return new Bebida(AGUA_MINERAL, tamanho, comGelo);
+    }
 
-	public void setTipo(TipoBebida tipo) {
-		this.tipo = tipo;
-	}
-
-	public String getTamanho() {
-		return tamanho;
-	}
-
-	public void setTamanho(String tamanho) {
-		this.tamanho = tamanho;
-	}
-
-	public boolean isComGelo() {
-		return comGelo;
-	}
-
-	public void setComGelo(boolean comGelo) {
-		this.comGelo = comGelo;
-	}
-    
+    // Getters
+    public String getMarca() { return marca; }
+    public Tamanho getTamanho() { return tamanho; }
+    public boolean isComGelo() { return comGelo; }
 }
