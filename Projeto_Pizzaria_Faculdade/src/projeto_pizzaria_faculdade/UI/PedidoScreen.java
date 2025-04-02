@@ -33,7 +33,7 @@ public class PedidoScreen extends javax.swing.JFrame {
      */
     public PedidoScreen() {
         initComponents();
-        pedidoAtual = new Pedido();
+        pedidoAtual = new Pedido(new Cliente("", ""));
     } 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -114,14 +114,14 @@ public class PedidoScreen extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 544, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -149,22 +149,21 @@ public class PedidoScreen extends javax.swing.JFrame {
     model.setRowCount(0); // Limpa a tabela
 
     for (ItemPedido item : pedidoAtual.getItens()) {
-        if (item instanceof Pizza) {
-            Pizza pizza = (Pizza) item;
-            model.addRow(new Object[]{
+        switch (item) {
+            case Pizza pizza -> model.addRow(new Object[]{
                 "Pizza",
-                pizza.getNome() + " (" + pizza.getTamanho() + ") - " + 
-                String.join(", ", pizza.getIngredientesExtras()),
+                pizza.getNome() + " (" + pizza.getTamanho() + ") - " +
+                        String.join(", ", pizza.getIngredientesExtras()),
                 "R$ " + pizza.getPreco()
             });
-        }else if (item instanceof Bebida) {
-            Bebida bebida = (Bebida) item;
-            model.addRow(new Object[]{
+            case Bebida bebida -> model.addRow(new Object[]{
                 "Bebida",
                 bebida.getMarca() + " - " + bebida.getTamanho().getMl() + "ml" +
-                (bebida.isComGelo() ? " (Com Gelo)" : " (Sem Gelo)"),
+                        (bebida.isComGelo() ? " (Com Gelo)" : " (Sem Gelo)"),
                 "R$ " + bebida.getPreco()
             });
+            default -> {
+            }
         }
     }
 
@@ -216,29 +215,28 @@ public class PedidoScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAddPizzaActionPerformed
 
     private void btnFinalizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinalizarActionPerformed
-        
-        String nome = txtNome.getText().trim();
-    String endereco = txtEndereco.getText().trim();
-    
-    if (nome.isEmpty() || endereco.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Preencha nome e endereço!");
+     // Verifica campos vazios
+    if (txtNome.getText().isEmpty() || txtEndereco.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Preencha todos os dados do cliente!");
         return;
     }
-    
-    clienteAtual = new Cliente(nome, endereco);
-    pedidoAtual.setCliente(clienteAtual); // Adicione este método na classe Pedido
-    
-    JOptionPane.showMessageDialog(this, 
-        "Pedido finalizado!\n" + 
-        "Cliente: " + clienteAtual.getNomeCliente() + "\n" +
-        "Total: R$ " + pedidoAtual.calcularTotal()
+
+    // Cria e vincula o cliente ao pedido
+    Cliente cliente = new Cliente(txtNome.getText(), txtEndereco.getText());
+    pedidoAtual.setCliente(cliente); // 👈 LINHA CRUCIAL QUE ESTAVA FALTANDO!
+
+    // Confirmação
+    int resposta = JOptionPane.showConfirmDialog(
+        this, 
+        "Deseja finalizar o pedido?",
+        "Confirmação",
+        JOptionPane.YES_NO_OPTION
     );
-    
-    // Reiniciar para novo pedido
-    pedidoAtual = new Pedido();
-    txtNome.setText("");
-    txtEndereco.setText("");
-    atualizarTabelaItens();
+
+    if (resposta == JOptionPane.YES_OPTION) {
+        new PedidoDetalhesScreen(pedidoAtual).setVisible(true);
+        this.dispose();
+    }
     }//GEN-LAST:event_btnFinalizarActionPerformed
 
     private void btnAddBebidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBebidaActionPerformed
@@ -286,15 +284,6 @@ public class PedidoScreen extends javax.swing.JFrame {
     dialog.setVisible(true);
     }//GEN-LAST:event_btnAddBebidaActionPerformed
    
-    private void atualizarTotal() {
-    double total = 0;
-    for(int i = 0; i < tblItens.getRowCount(); i++) {
-        String precoStr = tblItens.getValueAt(i, 2).toString().replace("R$ ", "");
-        total += Double.parseDouble(precoStr);
-    }
-    lblTotal.setText(String.format("Total: R$ %.3f", pedidoAtual.getTotal()));
-    }
-    
     /**
      * @param args the command line arguments
      */

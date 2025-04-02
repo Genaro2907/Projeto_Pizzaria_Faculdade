@@ -1,12 +1,9 @@
 package projeto_pizzaria_faculdade.Util;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import projeto_pizzaria_faculdade.Util.items.Bebida;
-import projeto_pizzaria_faculdade.Util.items.Pizza;
 import projeto_pizzaria_faculdade.Util.items.StatusPedido;
 
 public class Pedido {
@@ -50,43 +47,7 @@ public class Pedido {
         }
         return removido;
     }
-	
-    /*public String getDetalhesPedido() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Pedido ID: ").append(idPedido).append("\n");
-        sb.append("Cliente: ").append(cliente.getNomeCliente()).append("\n");
-        sb.append("Endereço: ").append(cliente.getEnderecoCliente()).append("\n");
-        sb.append("Data/Hora: ").append(DateTimeFormatter
-            .ofPattern("dd/MM/yyyy HH:mm").format(dataHora)).append("\n");
-        sb.append("Itens:\n");
-        
-        for (ItemPedido item : itens) {
-            if (item instanceof Pizza) {
-            	Pizza pizza = (Pizza) item;
-                sb.append("- Pizza ").append(pizza.getNome())
-                  .append(" (Tamanho: ").append(pizza.getTamanho())
-                  .append(", Extras: ").append(String.join(", ", pizza.getIngredientesExtras()))
-                  .append(") → R$ ").append(pizza.getPreco()).append("\n");
-            } else if (item instanceof Bebida) {
-                Bebida bebida = (Bebida) item;
-                sb.append("- ")
-                  .append(bebida.getTipo().toString().charAt(0))
-                  .append(bebida.getTipo().toString().substring(1).toLowerCase())
-                  .append(" ")
-                  .append(bebida.getMarca())
-                  .append(" (")
-                  .append(bebida.getTamanho())
-                  .append(", Gelo: ").append(bebida.isComGelo() ? "Sim" : "Não")
-                  .append(") → R$ ").append(bebida.getPreco()).append("\n");
-            }
-        }
-        
-        sb.append("\nTotal: R$ ").append(String.format("%.2f", total));
-        sb.append("\nStatus: ").append(status);
-        
-        return sb.toString();
-    }*/
-	public int getIdPedido() {
+                public int getIdPedido() {
 		return idPedido;
 	}
 
@@ -117,4 +78,11 @@ public class Pedido {
 	public void setStatus(StatusPedido status) {
 	        this.status = status;
 	    }
+
+            public StatusPedido getStatus() {
+                return status;
+            }
+        
+
+   
 }
