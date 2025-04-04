@@ -23,40 +23,37 @@ public class PedidoDetalhesScreen extends javax.swing.JFrame {
     
     private Pedido pedidoAtual;
     
-
-    /**
-     * Creates new form PedidoDetalhesScreen
-     */
     public PedidoDetalhesScreen(Pedido pedido) {
         this.pedidoAtual = pedido;
         initComponents();
-         // Preenche o combobox com as descrições dos status
+        this.setLocationRelativeTo(null);
     for (StatusPedido status : StatusPedido.values()) {
         cmbStatus.addItem(status.toString());
     }
     
-    // Seleciona o status atual do pedido
+
     cmbStatus.setSelectedItem(pedidoAtual.getStatus().toString());
         exibirdadosPedido();
+     
+     if (pedidoAtual.getStatus() == null) {
+        pedidoAtual.setStatus(StatusPedido.EM_ABERTO); 
+    }
         
     }
     private void exibirdadosPedido() {
-    if (pedidoAtual.getCliente() == null) { // 👈 Verificação de segurança
+    if (pedidoAtual.getCliente() == null) {
     JOptionPane.showMessageDialog(this, "Cliente não vinculado ao pedido!");
         return;
     }
-           // Dados do Cliente
     txtNome.setText(pedidoAtual.getCliente().getNomeCliente());
     txtEndereco.setText(pedidoAtual.getCliente().getEnderecoCliente());
     
-    // Data/Hora formatada
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     txtDataHora.setText(pedidoAtual.getDataHora().format(formatter));
     
     
-    // Tabela de Itens
     DefaultTableModel model = (DefaultTableModel) tblItens.getModel();
-    model.setRowCount(0); // Limpa a tabela
+    model.setRowCount(0);
     
     for (ItemPedido item : pedidoAtual.getItens()) {
         if (item instanceof Pizza pizza) {
@@ -64,17 +61,18 @@ public class PedidoDetalhesScreen extends javax.swing.JFrame {
                 "Pizza",
                 pizza.getNome() + " (" + pizza.getTamanho() + ") - " + 
                 String.join(", ", pizza.getIngredientesExtras()),
-                "R$ " + pizza.getPreco()
+                String.format("R$ %.2f", pizza.getPreco())
             });
         } else if (item instanceof Bebida bebida) {
             model.addRow(new Object[]{
                 "Bebida",
                 bebida.getMarca() + " - " + bebida.getTamanho().getMl() + "ml" +
                 (bebida.isComGelo() ? " (Com Gelo)" : " (Sem Gelo)"),
-                "R$ " + bebida.getPreco()
+               String.format("R$ %.2f", bebida.getPreco())
             });
         }
     } 
+    lblTotal.setText(String.format("Total: R$ %.2f", pedidoAtual.getTotal()));
     }
 
     /**
@@ -98,6 +96,8 @@ public class PedidoDetalhesScreen extends javax.swing.JFrame {
         txtDataHora = new javax.swing.JFormattedTextField();
         cmbStatus = new javax.swing.JComboBox<>();
         btnAtualizarStatus = new javax.swing.JButton();
+        btnNovoPedido = new javax.swing.JButton();
+        lblTotal = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -123,6 +123,11 @@ public class PedidoDetalhesScreen extends javax.swing.JFrame {
             }
         ));
         jScrollPane1.setViewportView(tblItens);
+        if (tblItens.getColumnModel().getColumnCount() > 0) {
+            tblItens.getColumnModel().getColumn(0).setPreferredWidth(80);
+            tblItens.getColumnModel().getColumn(1).setPreferredWidth(250);
+            tblItens.getColumnModel().getColumn(2).setPreferredWidth(100);
+        }
 
         txtNome.setEnabled(false);
 
@@ -138,6 +143,15 @@ public class PedidoDetalhesScreen extends javax.swing.JFrame {
             }
         });
 
+        btnNovoPedido.setText("Novo Pedido");
+        btnNovoPedido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNovoPedidoActionPerformed(evt);
+            }
+        });
+
+        lblTotal.setText("jLabel6");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -145,32 +159,34 @@ public class PedidoDetalhesScreen extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addComponent(jLabel1)
+                            .addGap(25, 25, 25)
+                            .addComponent(txtNome))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel2)
+                                .addComponent(jLabel3)
+                                .addComponent(jLabel4))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 157, Short.MAX_VALUE)
+                                    .addComponent(btnAtualizarStatus))
+                                .addComponent(txtDataHora)
+                                .addComponent(txtEndereco))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtEndereco))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtDataHora))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblTotal)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnAtualizarStatus)
-                                .addGap(14, 14, 14))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 13, Short.MAX_VALUE)))
+                                .addComponent(btnNovoPedido)
+                                .addGap(41, 41, 41))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 475, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -195,9 +211,15 @@ public class PedidoDetalhesScreen extends javax.swing.JFrame {
                     .addComponent(btnAtualizarStatus))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(102, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(0, 125, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnNovoPedido)
+                    .addComponent(lblTotal))
+                .addGap(22, 22, 22))
         );
 
         pack();
@@ -227,16 +249,26 @@ public class PedidoDetalhesScreen extends javax.swing.JFrame {
                 JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnAtualizarStatusActionPerformed
+
+    private void btnNovoPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoPedidoActionPerformed
+    int resposta = JOptionPane.showConfirmDialog(
+        this, 
+        "Deseja iniciar um novo pedido?",
+        "Confirmação",
+        JOptionPane.YES_NO_OPTION
+    );
+    
+    if (resposta == JOptionPane.YES_OPTION) {
+        this.dispose();
+        new PedidoScreen().setVisible(true);
+    }
+    }//GEN-LAST:event_btnNovoPedidoActionPerformed
     public static void main(String args[]) {
     java.awt.EventQueue.invokeLater(() -> {
-        // Cria um pedido de teste
         Cliente clienteTeste = new Cliente("Cliente Exemplo", "Rua Teste, 123");
         Pedido pedidoTeste = new Pedido(clienteTeste);
         
-        // Adiciona itens fictícios (opcional)
-        pedidoTeste.adicionarItem(Pizza.criarMargherita("M", List.of("Queijo Extra")));
-        
-        // Abre a tela
+        pedidoTeste.adicionarItem(Pizza.criarMargherita("M", List.of("Queijo Extra"), true));
         new PedidoDetalhesScreen(pedidoTeste).setVisible(true);
     });
 }
@@ -249,6 +281,7 @@ public class PedidoDetalhesScreen extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAtualizarStatus;
+    private javax.swing.JButton btnNovoPedido;
     private javax.swing.JComboBox<String> cmbStatus;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -256,6 +289,7 @@ public class PedidoDetalhesScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblTotal;
     private javax.swing.JTable tblItens;
     private javax.swing.JFormattedTextField txtDataHora;
     private javax.swing.JTextField txtEndereco;

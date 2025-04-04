@@ -11,26 +11,23 @@ public class Cliente {
     public Cliente() {};
     
     public Cliente(String nomeCliente, String enderecoCliente) {
-		this.nomeCliente = nomeCliente;
-		this.enderecoCliente = enderecoCliente;
+        this.nomeCliente = nomeCliente;
+        this.enderecoCliente = enderecoCliente;
     }
 
     public String getNomeCliente() {
-		return nomeCliente;
+        return nomeCliente;
     }
 
     public void setNomeCliente(String nomeCliente) {
-		this.nomeCliente = nomeCliente;
+        this.nomeCliente = nomeCliente;
     }
 
     public String getEnderecoCliente() {
-		return enderecoCliente;
+        return enderecoCliente;
     }
 
     public void setEnderecoCliente(String enderecoCliente) {
-		this.enderecoCliente = enderecoCliente;
+        this.enderecoCliente = enderecoCliente;
     }
-    
-    
-
 }

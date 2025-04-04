@@ -3,7 +3,7 @@ package projeto_pizzaria_faculdade.Util.items;
 public enum StatusPedido {
     EM_ABERTO("Em Aberto"), 
     EM_PREPARO("Em Preparo"), 
-    ENTREGUE("Entregue");
+    ENTREGUE("Finalizado");
 
     private final String descricao;
 
@@ -13,7 +13,7 @@ public enum StatusPedido {
 
     @Override
     public String toString() {
-        return descricao; // Retorna a descrição formatada
+        return descricao; 
     }
     
     public static StatusPedido fromString(String text) {
